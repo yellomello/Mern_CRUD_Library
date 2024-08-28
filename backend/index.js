@@ -1,17 +1,13 @@
-import express from "express";
-import { PORT, DBURL } from "./config.js";
-import mongoose from "mongoose";
-import { Book } from "./models/bookModel.js";
-import booksRoute from "./routes/booksRoute.js";
 import cors from "cors";
-
+import express from "express";
+import mongoose from "mongoose";
+import { PORT, DBURL } from "./config.js";
+import booksRoute from "./routes/booksRoute.js";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/books', booksRoute);
-
-
 
 //DB Connection
 mongoose.connect(DBURL)
@@ -22,5 +18,5 @@ mongoose.connect(DBURL)
     });
   })
   .catch((e) => {
-    console.log(e);
+    console.log("DB error", e);
   });

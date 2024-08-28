@@ -1,130 +1,90 @@
 import express from 'express';
-import {Book} from '../models/bookModel.js';
+import { Book } from '../models/bookModel.js';
 
+const router = express.Router();
 
-const router= express.Router();
-
-
-
-  //POST ALL BOOKS
+// POST: Create a new book
 router.post("/", async (request, response) => {
-    try {
-      if (
-        !request.body.title ||
-        !request.body.author ||
-        !request.body.publishYear
-      ) {
-        return response
-          .status(400)
-          .send({ message: "Send all required fields." });
-      }
-      const newBook = {
-        title: request.body.title,
-        author: request.body.author,
-        publishYear: request.body.publishYear,
-      };
-  
-      const book = await Book.create(newBook);
-      return response
-        .status(200)
-        .send({ message: "Book created succcessfully!" });
-    } catch (e) {
-      console.log(e);
-      response.status(500).send({ message: error.message });
+  try {
+    const { title, author, publishYear } = request.body;
+
+    if (!title || !author || !publishYear) {
+      return response.status(400).json({ message: "Send all required fields." });
     }
-  });
-  
-  //GET ALL BOOKS
-  router.get("/", async(request,response)=>{
-    try{
-      const books =await Book.find({});
-      return response.status(200).json({
-        count: books.length,
-        data:books,
-      });
-  
-    }
-    catch (e) {
-      console.log(e);
-      response.status(500).send({ message: error.message });
-    }
-  });
-  
-  //GET ONE BOOK BY ID
-  router.get("/:id", async(request,response)=>{
-    try{
-      const {id} = request.params;
-      const book = await Book.findById(id);
-  
-      return response.status(200).json({book});
-  
-    }
-    catch (e) {
-      console.log(e);
-      response.status(500).send({ message: error.message });
-    }
-  });
-  
-  //UPDATE A BOOK
-  router.put("/:id", async(request, response)=>{
-    try{
-      if(
-        !request.body.title ||
-        !request.body.author ||
-        !request.body.publishYear
-      ) {
-        return response.status(400).send({message: "Send all required files please!"})
-      }
-    
-    const {id} = request.params;
-    const result = await Book.findByIdAndUpdate(id,request.body);
-  
-    if(!result){
-      return response.status(404).json({message:'book not found'});
-    }
-    
-    return response.status(200).send({message: "Book updated successfully"});
-  
-  
-  
-  
-  
-  
-  
-    }
-    catch(error){
-      console.log(error);
-      return response.status(500).send({message: error});
-  
-    }
-  
-  })
-  
-  //DELETE A BOOK
-  router.delete("/:id", async(request, response)=>{
-    try{
-    const {id} = request.params;
-    const result = await Book.findByIdAndDelete(id);
-  
-    if(!result){
-      return response.status(404).json({message:'book not found'});
-    }
-    
-    return response.status(200).send({message: "Book Deleted successfully"});
-  
-  
-  
-  
-  
-    }
-    catch(error){
-      console.log(error.message)
-      return response.status(500).send({message: error.message});
-    }
+
+    const book = await Book.create({ title, author, publishYear });
+    response.status(201).json({ message: "Book created successfully!", book });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ message: "Internal server error" });
   }
-  )
-  
+});
 
-  export default router;
+// GET: Retrieve all books
+router.get("/", async (request, response) => {
+  try {
+    const books = await Book.find({});
+    response.status(200).json({ count: books.length, data: books });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ message: "Internal server error" });
+  }
+});
 
-  
+// GET: Retrieve a book by ID
+router.get("/:id", async (request, response) => {
+  try {
+    const book = await Book.findById(request.params.id);
+    if (!book) {
+      return response.status(404).json({ message: 'Book not found' });
+    }
+    response.status(200).json({ book });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// PUT: Update a book
+router.put("/:id", async (request, response) => {
+  try {
+    const { title, author, publishYear } = request.body;
+
+    if (!title || !author || !publishYear) {
+      return response.status(400).json({ message: "Send all required fields." });
+    }
+
+    const book = await Book.findByIdAndUpdate(
+      request.params.id,
+      { title, author, publishYear },
+      { new: true }
+    );
+
+    if (!book) {
+      return response.status(404).json({ message: 'Book not found' });
+    }
+
+    response.status(200).json({ message: "Book updated successfully", book });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// DELETE: Remove a book
+router.delete("/:id", async (request, response) => {
+  try {
+    const book = await Book.findByIdAndDelete(request.params.id);
+
+    if (!book) {
+      return response.status(404).json({ message: 'Book not found' });
+    }
+
+    response.status(200).json({ message: "Book deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ message: "Internal server error" });
+  }
+});
+
+export default router;
