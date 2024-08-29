@@ -16,7 +16,7 @@ router.post("/", async (request, response) => {
     response.status(201).json({ message: "Book created successfully!", book });
   } catch (error) {
     console.error(error);
-    response.status(500).json({ message: "Internal server error" });
+    response.status(500).json({ error, message: "Internal server error" });
   }
 });
 
@@ -27,7 +27,7 @@ router.get("/", async (request, response) => {
     response.status(200).json({ count: books.length, data: books });
   } catch (error) {
     console.error(error);
-    response.status(500).json({ message: "Internal server error" });
+    response.status(500).json({ error, message: "Internal server error" });
   }
 });
 
@@ -41,7 +41,7 @@ router.get("/:id", async (request, response) => {
     response.status(200).json({ book });
   } catch (error) {
     console.error(error);
-    response.status(500).json({ message: "Internal server error" });
+    response.status(500).json({ error, message: "Internal server error" });
   }
 });
 
@@ -67,7 +67,7 @@ router.put("/:id", async (request, response) => {
     response.status(200).json({ message: "Book updated successfully", book });
   } catch (error) {
     console.error(error);
-    response.status(500).json({ message: "Internal server error" });
+    response.status(500).json({ error, message: "Internal server error" });
   }
 });
 
@@ -83,7 +83,7 @@ router.delete("/:id", async (request, response) => {
     response.status(200).json({ message: "Book deleted successfully" });
   } catch (error) {
     console.error(error);
-    response.status(500).json({ message: "Internal server error" });
+    response.status(500).json({ error, message: "Internal server error" });
   }
 });
 
